@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 from langchain import OpenAI
 from langchain.chains import ConversationChain
+from langchain.chat_models import ChatOpenAI
+import uvicorn
 
 load_dotenv()
 
@@ -31,11 +33,13 @@ async def chat(websocket: WebSocket):
         except WebSocketDisconnect:
             break
 
-@app.get('/')
-async def get():
-    return "Hello World!"
 
 if __name__ == "__main__":
-    import uvicorn
+    # uvicorn.run("app:app", host="0.0.0.0", port=9000, reload=True)
 
-    uvicorn.run("app:app", host="0.0.0.0", port=9000, reload=True)
+    llm = OpenAI(temperature=0.7)
+    chain = ConversationChain(llm=llm)
+    while True:
+        user_input = input("Human: ")
+        user_output = chain.run(input=user_input)
+        print(f"AI Bot:{user_output}")
